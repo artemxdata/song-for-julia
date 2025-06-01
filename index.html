@@ -217,10 +217,24 @@
             .love-message {
                 font-size: 1.5rem;
             }
+
+            /* Оптимизация фонового изображения для мобильных устройств */
+            .background-image {
+                background-image: url('photo_2025-05-05_12-28-48.jpg');
+                background-position: center center;
+                background-attachment: fixed;
+                filter: brightness(0.4) blur(3px); /* Меньше размытие для мобильных */
+            }
+
+            .vinyl-record {
+                width: 300px;
+                height: 300px;
+            }
         }
     </style>
 </head>
 <body>
+    <!-- Остальной код остается без изменений -->
     <div class="background-image"></div>
     <div class="vinyl-background">
         <div class="vinyl-record" id="vinylRecord"></div>
