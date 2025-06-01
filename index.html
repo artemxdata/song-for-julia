@@ -14,13 +14,26 @@
 
         body {
             font-family: 'Jost', sans-serif;
-            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
             color: white;
             overflow: hidden;
             height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
+            position: relative;
+        }
+
+        .background-image {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('https://drive.google.com/uc?export=view&id=1Cky_BRjPTfJEWhuEoYZrIBv3WzCThtol');
+            background-size: cover;
+            background-position: center;
+            filter: brightness(0.4) blur(5px);
+            z-index: -2;
         }
 
         .vinyl-background {
@@ -208,6 +221,7 @@
     </style>
 </head>
 <body>
+    <div class="background-image"></div>
     <div class="vinyl-background">
         <div class="vinyl-record" id="vinylRecord"></div>
     </div>
@@ -290,8 +304,6 @@
                 });
             }
         }
-
-
 
         function changeVolume() {
             const volume = document.getElementById('volumeSlider').value;
