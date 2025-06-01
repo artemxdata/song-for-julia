@@ -234,7 +234,7 @@
         </div>
 
         <div class="now-playing" id="nowPlaying">
-            Нажми play, чтобы послушать 
+            Нажми play, чтобы услышать мою песню для тебя
         </div>
 
         <div class="footer">
@@ -249,51 +249,49 @@
 
     <script>
         let isPlaying = false;
+        let userInteracted = false;
         const audioPlayer = document.getElementById('audioPlayer');
         const vinylRecord = document.getElementById('vinylRecord');
         const playIcon = document.getElementById('playIcon');
         const pauseIcon = document.getElementById('pauseIcon');
         const nowPlaying = document.getElementById('nowPlaying');
 
+        // Отслеживаем первое взаимодействие пользователя
+        document.addEventListener('click', () => {
+            userInteracted = true;
+        });
+
         function togglePlay() {
-            if (!audioPlayer.src) {
-                // Если нет аудио файла, показываем имитацию
-                simulatePlay();
+            if (isPlaying) {
+                audioPlayer.pause();
                 return;
             }
 
-            if (isPlaying) {
-                audioPlayer.pause();
-                pausePlayback();
-            } else {
-                audioPlayer.play();
-                startPlayback();
+            // Сбрасываем аудио к началу перед воспроизведением
+            audioPlayer.currentTime = 0;
+            
+            const playPromise = audioPlayer.play();
+            
+            if (playPromise !== undefined) {
+                playPromise.then(() => {
+                    console.log('Воспроизведение началось успешно');
+                }).catch(error => {
+                    console.log('Ошибка воспроизведения:', error);
+                    
+                    if (error.name === 'AbortError') {
+                        nowPlaying.textContent = 'Попробуйте еще раз - нажмите Play';
+                    } else if (error.name === 'NotAllowedError') {
+                        nowPlaying.textContent = 'Разрешите воспроизведение звука в браузере';
+                    } else if (error.name === 'NotSupportedError') {
+                        nowPlaying.textContent = 'Формат файла не поддерживается';
+                    } else {
+                        nowPlaying.textContent = 'Проблема с загрузкой песни';
+                    }
+                });
             }
         }
 
-        function simulatePlay() {
-            if (isPlaying) {
-                pausePlayback();
-            } else {
-                startPlayback();
-                nowPlaying.textContent = '♪ Играет твоя песня... ♪';
-            }
-        }
 
-        function startPlayback() {
-            isPlaying = true;
-            vinylRecord.classList.remove('paused');
-            playIcon.style.display = 'none';
-            pauseIcon.style.display = 'block';
-        }
-
-        function pausePlayback() {
-            isPlaying = false;
-            vinylRecord.classList.add('paused');
-            playIcon.style.display = 'block';
-            pauseIcon.style.display = 'none';
-            nowPlaying.textContent = 'Нажми play, чтобы послушать';
-        }
 
         function changeVolume() {
             const volume = document.getElementById('volumeSlider').value;
@@ -303,9 +301,42 @@
         }
 
         // Добавляем обработчики событий для аудио
-        audioPlayer.addEventListener('ended', pausePlayback);
-        audioPlayer.addEventListener('pause', pausePlayback);
-        audioPlayer.addEventListener('play', startPlayback);
+        audioPlayer.addEventListener('play', () => {
+            isPlaying = true;
+            vinylRecord.classList.remove('paused');
+            playIcon.style.display = 'none';
+            pauseIcon.style.display = 'block';
+            nowPlaying.textContent = '♪ Играет песня для тебя ♪';
+        });
+
+        audioPlayer.addEventListener('pause', () => {
+            isPlaying = false;
+            vinylRecord.classList.add('paused');
+            playIcon.style.display = 'block';
+            pauseIcon.style.display = 'none';
+            nowPlaying.textContent = 'Нажми play, чтобы услышать мою песню для тебя';
+        });
+
+        audioPlayer.addEventListener('ended', () => {
+            isPlaying = false;
+            vinylRecord.classList.add('paused');
+            playIcon.style.display = 'block';
+            pauseIcon.style.display = 'none';
+            nowPlaying.textContent = 'Песня закончилась ♪';
+        });
+
+        audioPlayer.addEventListener('loadstart', () => {
+            console.log('Начинается загрузка аудио');
+        });
+
+        audioPlayer.addEventListener('canplay', () => {
+            console.log('Аудио готово к воспроизведению');
+        });
+
+        audioPlayer.addEventListener('error', (e) => {
+            console.log('Ошибка загрузки аудио:', e);
+            nowPlaying.textContent = 'Не удалось загрузить песню - проверьте файл';
+        });
 
         // Инициализация
         changeVolume();
